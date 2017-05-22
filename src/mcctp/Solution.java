@@ -103,7 +103,8 @@ public class Solution {
                         for (int k = 0; k < kVehicles; k++) {
                             int lastNode = vehicleSet.get(k).getLastNode();
                             double distance = distanceMap.get(lastNode + "," + optionalNodeSet.get(j).getIndex());
-                            if(distance < minDistance && vehicleSet.get(k).getLatency() + distance <=  maxDuration){
+                            distance += vehicleSet.get(k).getLatency();
+                            if(distance < minDistance && distance <=  maxDuration){
                                 minDistance = distance;
                                 vehicleIndex = k;
                             }
