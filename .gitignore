@@ -1,9 +1,5 @@
 
-nbproject/private/private.properties
-build/built-jar.properties
-nbproject/private/private.properties
-nbproject/private/private.xml
-nbproject/private/private.xml
-nbproject/private/private.properties
-*.class
-build/built-jar.properties
+nbproject/
+build/
+dist/
+build
