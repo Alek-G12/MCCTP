@@ -39,6 +39,7 @@ public class GUI extends javax.swing.JFrame {
         selectBtn = new javax.swing.JButton();
         openBtn = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
+        shuffleBtn = new javax.swing.JButton();
 
         fileChooser.setCurrentDirectory(new java.io.File("C:\\Users\\Alek_G12\\Desktop\\MCCTP\\InstancesMCCTP\\Selected"));
         fileChooser.setDialogTitle("Seleccionar Archivo de Instancia MCCTP");
@@ -98,6 +99,14 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        shuffleBtn.setText("Mejorar");
+        shuffleBtn.setEnabled(false);
+        shuffleBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shuffleBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,7 +118,9 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 488, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(openBtn)))
+                        .addComponent(openBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(shuffleBtn)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -118,10 +129,12 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(openBtn)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(openBtn)
+                    .addComponent(shuffleBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -138,7 +151,8 @@ public class GUI extends javax.swing.JFrame {
     private void openBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openBtnActionPerformed
         // TODO add your handling code here:
         if (path == null) {
-            JOptionPane.showMessageDialog(jPanel1, "Archivo no seleccionado", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(jPanel1, "Archivo no seleccionado",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         Instance instance = new Instance(path);
@@ -149,15 +163,27 @@ public class GUI extends javax.swing.JFrame {
 //        System.out.println("**************************************************");
 //        instance.printDistanceMap();
         System.out.println("**************************************************");
-        Solution solution = new Solution(instance.vehicles, instance.upperBound, instance.tNodes, instance.vNodes, instance.wCustomersToCover, instance.distanceMap, instance.matrix);
-        solution.initialize();
-        solution.departFromDepot();
-        solution.goToOptionalNodes();
-        solution.printSets();
-        solution.printTotalLatency();
-        
+        bestSolution = new Solution(instance.vehicles, instance.upperBound,
+                instance.tNodes, instance.vNodes, instance.wCustomersToCover,
+                instance.distanceMap, instance.matrix);
+        bestSolution.initialize();
+        bestSolution.departFromDepot();
+        bestSolution.goToOptionalNodes();
+        bestSolution.printSets();
+        bestSolution.printTotalLatency();
+        shuffleBtn.setEnabled(true);
 
     }//GEN-LAST:event_openBtnActionPerformed
+
+    private void shuffleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shuffleBtnActionPerformed
+        // TODO add your handling code here:
+        Shuffle shuffler = new Shuffle();
+        Solution shuffled = shuffler.improveSolution(bestSolution);
+        if (shuffled.getTotalLatency() < bestSolution.getTotalLatency()) {
+            bestSolution = shuffled;
+        }
+
+    }//GEN-LAST:event_shuffleBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -176,13 +202,17 @@ public class GUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GUI.class.getName()).log(
+                    java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GUI.class.getName()).log(
+                    java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GUI.class.getName()).log(
+                    java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GUI.class.getName()).log(
+                    java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -203,20 +233,22 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton openBtn;
     private javax.swing.JTextField pathText;
     private javax.swing.JButton selectBtn;
+    private javax.swing.JButton shuffleBtn;
     // End of variables declaration//GEN-END:variables
 
     File path;
-    
+    Solution bestSolution;
+
     private static class MyCustomFilter extends FileFilter {
-        
+
         public MyCustomFilter() {
         }
-        
+
         @Override
         public boolean accept(File f) {
             return f.isDirectory() || f.getAbsolutePath().endsWith(".ctp");
         }
-        
+
         @Override
         public String getDescription() {
             return "MCCTP Instance Files (*.ctp)";

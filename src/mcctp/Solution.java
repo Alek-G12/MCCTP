@@ -10,6 +10,8 @@ import java.util.Map;
  * @author Alek_G12
  */
 public class Solution {
+    
+    private double totalLatency = 0;
 
     public int kVehicles;
     public long maxDuration;
@@ -143,12 +145,15 @@ public class Solution {
     }
 
     public void printTotalLatency() {
-        double totalLatency = 0;
         for (Map.Entry<Integer, Vehicle> entry : vehicleSet.entrySet()) {
             totalLatency += entry.getValue().getLatency();
 
         }
         System.out.println("Total Latency: " + totalLatency);
+    }
+
+    public double getTotalLatency() {
+        return totalLatency;
     }
 
 }
